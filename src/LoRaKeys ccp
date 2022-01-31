@@ -1,0 +1,99 @@
+#include <Arduino.h>
+#include <Wire.h>
+#include "LoRaKeys.h"
+
+byte DEVADD[4];
+byte APPEUI[8];
+byte DEVEUI[8];
+byte APPKEY[16];
+byte NWKKEY[16];
+
+
+byte eepDEVADD[4];
+byte eepNWKKEY[16];
+byte eepAPPEUI[8];
+byte eepDEVEUI[8];
+byte eepAPPKEY[16];
+
+
+
+// This EUI must be in little-endian format, so least-significant-byte
+// first. When copying an EUI from ttnctl output, this means to reverse
+// the bytes. For TTN issued EUIs the last bytes should be 0xD5, 0xB3,
+// 0x70.
+static const u1_t PROGMEM APPEUI[8] = { eepAPPEUI[7], eepAPPEUI[6], eepAPPEUI[5], eepAPPEUI[4],
+                                        eepAPPEUI[3], eepAPPEUI[2], eepAPPEUI[1], eepAPPEUI[0] };
+
+// This should also be in little endian format, see above.
+static const u1_t PROGMEM DEVEUI[8] = { eepDEVEUI[7], eepDEVEUI[6], eepDEVEUI[5], eepDEVEUI[4],
+                                        eepDEVEUI[3], eepDEVEUI[2], eepDEVEUI[1], eepDEVEUI[0] };
+
+// This key should be in big endian format (or, since it is not really a
+// number but a block of memory, endianness does not really apply). In
+// practice, a key taken from the TTN console can be copied as-is.
+static const u1_t PROGMEM APPKEY[16] = { eepAPPKEY[0], eepAPPKEY[1], eepAPPKEY[2], eepAPPKEY[3],
+                                         eepAPPKEY[4], eepAPPKEY[5], eepAPPKEY[6], eepAPPKEY[7],
+                                         eepAPPKEY[8], eepAPPKEY[9], eepAPPKEY[10], eepAPPKEY[11],
+                                         eepAPPKEY[12], eepAPPKEY[13], eepAPPKEY[14], eepAPPKEY[15] };
+
+
+
+
+byte LoRaKeys::readEEPROM(unsigned int eeaddress ){
+  int deviceaddress = 0x50;
+  byte rdata = 0xFF;
+  Wire.beginTransmission(deviceaddress);
+  Wire.write((int)(eeaddress >> 8));   // MSB
+  Wire.write((int)(eeaddress & 0xFF)); // LSB
+  Wire.endTransmission();
+  Wire.requestFrom(deviceaddress,1);
+  if (Wire.available()) { rdata = Wire.read(); }
+  return rdata;
+}
+
+
+
+void LoRaKeys::loadLoRaKeys(void) {
+  if ( readEEPROM(0) == 0x01 ) {
+    Serial.println("ABP:");
+    byte x = 1;
+    for (byte i = 0; i < 4; ++i) {
+      DEVADD[i] = readEEPROM(x);
+      ++x;
+    }
+
+    x = 5;
+    for (byte i = 0; i < 16; ++i) {
+      NWKKEY[i] = readEEPROM(x);
+      ++x;
+    }
+
+    x = 21;
+    for (byte i = 0; i < 16; ++i) {
+      APPKEY[i] = readEEPROM(x);
+      ++x;
+    }    
+  } else if ( readEEPROM(0) == 0x02 ) {
+    Serial.println("OTAA:");
+    byte x = 1;
+    for (byte i = 0; i < 8; ++i) {
+      APPEUI[i] = readEEPROM(x);
+      ++x;
+    }
+
+    x = 9;
+    for (byte i = 0; i < 8; ++i) {
+      DEVEUI[i] = readEEPROM(x);
+      ++x;
+    }
+
+    x = 17;
+    for (byte i = 0; i < 16; ++i) {
+      APPKEY[i] = readEEPROM(x);
+      ++x;
+    }
+    
+  } else {
+    Serial.println("Unknown");
+  }
+}
