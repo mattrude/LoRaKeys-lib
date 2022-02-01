@@ -16,7 +16,8 @@ class LoRaKeys {
     byte APPKEY[16];
     byte NWKKEY[16];
 
-    void buildLoRaKeys(void);
+    void buildLoRaKeysABP(void);
+    void buildLoRaKeysOTTA(void);
 
   private:
     byte eepDEVADD[4];
