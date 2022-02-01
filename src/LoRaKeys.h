@@ -7,27 +7,26 @@
 #include <hal/hal.h>
 #include <SPI.h>
 
-class LoRaKeys {
+class LoRaKeys
+{
   public:
+    void buildLoRaKeysABP(void);
+    void buildLoRaKeysOTTA(void);
 
+  private:
     byte DEVADD[4];
     byte APPEUI[8];
     byte DEVEUI[8];
     byte APPKEY[16];
     byte NWKKEY[16];
-
-    void buildLoRaKeysABP(void);
-    void buildLoRaKeysOTTA(void);
-
-  private:
     byte eepDEVADD[4];
-    byte eepNWKKEY[16];
     byte eepAPPEUI[8];
     byte eepDEVEUI[8];
     byte eepAPPKEY[16];
+    byte eepNWKKEY[16];
 
     void loadLoRaKeys(void);
-    byte readEEPROM(unsigned int eeaddress );
+    void readEEPROM(unsigned int eeaddress );
 };
 
 #endif
