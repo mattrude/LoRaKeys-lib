@@ -19,15 +19,14 @@ byte eepAPPKEY[16];
 byte eepNWKKEY[16];
 
 class LoRaKeys {
-  public:
-    int _key_type;
-    LoRaKeys(uint8_t, uint8_t);
-    void buildLoRaKeysABP(void);
-    void buildLoRaKeysOTTA(void);
-
   private:
+    byte _deviceaddress;
+    int buildLoRaKeysABP(void);
+    int buildLoRaKeysOTTA(void);
+    int readEEPROM(unsigned int eeaddress );
+  public:
+    LoRaKeys(byte);
     void loadLoRaKeys(void);
-    void readEEPROM(unsigned int eeaddress );
 };
 
 #endif
