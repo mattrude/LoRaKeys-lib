@@ -23,39 +23,39 @@ void LoRaKeys::loadLoRaKeys(void) {
         Serial.println("ABP:");
         byte x = 1;
         for (byte i = 0; i < 4; ++i) {
-        _DEVADD[i] = readEEPROM(x);
-        ++x;
+            _DEVADD[i] = readEEPROM(x);
+            ++x;
         }
 
         x = 5;
         for (byte i = 0; i < 16; ++i) {
-        _NWKKEY[i] = readEEPROM(x);
-        ++x;
+            _NWKKEY[i] = readEEPROM(x);
+            ++x;
         }
 
         x = 21;
         for (byte i = 0; i < 16; ++i) {
-        _APPKEY[i] = readEEPROM(x);
-        ++x;
+            _APPKEY[i] = readEEPROM(x);
+            ++x;
         }
         buildLoRaKeysABP();  
     } else if ( readEEPROM(0) == 0x02 ) {
         Serial.println("OTAA:");
         byte x = 1;
         for (byte i = 0; i < 8; ++i) {
-        _APPEUI[i] = readEEPROM(x);
-        ++x;
+            _APPEUI[i] = readEEPROM(x);
+            ++x;
         }
 
         x = 9;
         for (byte i = 0; i < 8; ++i) {
-        _DEVEUI[i] = readEEPROM(x);
-        ++x;
+            _DEVEUI[i] = readEEPROM(x);
+            ++x;
         }
 
         x = 17;
-        for (byte i = 0; i < 16; ++i) {
-        _APPKEY[i] = readEEPROM(x);
+            for (byte i = 0; i < 16; ++i) {
+            _APPKEY[i] = readEEPROM(x);
         ++x;
         }
         buildLoRaKeysOTTA();
