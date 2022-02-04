@@ -2,18 +2,18 @@
 #include <Wire.h>
 #include "LoRaKeys.h"
 
-LoRaKeys::LoRaKeys(byte loaddeviceaddress) {
-  this->_deviceaddress = loaddeviceaddress;
+LoRaKeys::LoRaKeys() {
   loadLoRaKeys();
 }
 
 int LoRaKeys::readEEPROM(unsigned int eeaddress ){
+  int deviceaddress = 0x50;
   byte rdata = 0xFF;
-  Wire.beginTransmission(_deviceaddress);
+  Wire.beginTransmission(deviceaddress);
   Wire.write((int)(eeaddress >> 8));   // MSB
   Wire.write((int)(eeaddress & 0xFF)); // LSB
   Wire.endTransmission();
-  Wire.requestFrom(_deviceaddress,1);
+  Wire.requestFrom(deviceaddress,1);
   if (Wire.available()) { rdata = Wire.read(); }
   return rdata;
 };
@@ -23,19 +23,19 @@ void LoRaKeys::loadLoRaKeys(void) {
     Serial.println("ABP:");
     byte x = 1;
     for (byte i = 0; i < 4; ++i) {
-      DEVADD[i] = readEEPROM(x);
+      eepDEVADD[i] = readEEPROM(x);
       ++x;
     }
 
     x = 5;
     for (byte i = 0; i < 16; ++i) {
-      NWKKEY[i] = readEEPROM(x);
+      eepNWKKEY[i] = readEEPROM(x);
       ++x;
     }
 
     x = 21;
     for (byte i = 0; i < 16; ++i) {
-      APPKEY[i] = readEEPROM(x);
+      eepAPPKEY[i] = readEEPROM(x);
       ++x;
     }
     buildLoRaKeysABP();  
@@ -43,19 +43,19 @@ void LoRaKeys::loadLoRaKeys(void) {
     Serial.println("OTAA:");
     byte x = 1;
     for (byte i = 0; i < 8; ++i) {
-      APPEUI[i] = readEEPROM(x);
+      eepAPPEUI[i] = readEEPROM(x);
       ++x;
     }
 
     x = 9;
     for (byte i = 0; i < 8; ++i) {
-      DEVEUI[i] = readEEPROM(x);
+      eepDEVEUI[i] = readEEPROM(x);
       ++x;
     }
 
     x = 17;
     for (byte i = 0; i < 16; ++i) {
-      APPKEY[i] = readEEPROM(x);
+      eepAPPKEY[i] = readEEPROM(x);
       ++x;
     }
     buildLoRaKeysOTTA();
@@ -65,7 +65,6 @@ void LoRaKeys::loadLoRaKeys(void) {
 }
 
 int LoRaKeys::buildLoRaKeysOTTA(void) {
-  loadLoRaKeys();
   static const u1_t PROGMEM APPEUI[8]  = { eepAPPEUI[7], eepAPPEUI[6], eepAPPEUI[5], eepAPPEUI[4],
                                          eepAPPEUI[3], eepAPPEUI[2], eepAPPEUI[1], eepAPPEUI[0] };
   static const u1_t PROGMEM DEVEUI[8]  = { eepDEVEUI[7], eepDEVEUI[6], eepDEVEUI[5], eepDEVEUI[4],
@@ -77,7 +76,7 @@ int LoRaKeys::buildLoRaKeysOTTA(void) {
 }
 
 int LoRaKeys::buildLoRaKeysABP(void) {
-  loadLoRaKeys();
+
   static const u1_t PROGMEM DEVADD[4]  = { eepDEVADD[3], eepDEVADD[2], eepDEVADD[1], eepDEVADD[0] };
   static const u1_t PROGMEM NWKKEY[16]  = { eepNWKKEY[0], eepNWKKEY[1], eepNWKKEY[2], eepNWKKEY[3],
                                             eepNWKKEY[4], eepNWKKEY[5], eepNWKKEY[6], eepNWKKEY[7],
