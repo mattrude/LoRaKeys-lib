@@ -3,86 +3,86 @@
 #include "LoRaKeys.h"
 
 LoRaKeys::LoRaKeys() {
-  loadLoRaKeys();
+    loadLoRaKeys();
 }
 
 int LoRaKeys::readEEPROM(unsigned int eeaddress ){
-  int deviceaddress = 0x50;
-  byte rdata = 0xFF;
-  Wire.beginTransmission(deviceaddress);
-  Wire.write((int)(eeaddress >> 8));   // MSB
-  Wire.write((int)(eeaddress & 0xFF)); // LSB
-  Wire.endTransmission();
-  Wire.requestFrom(deviceaddress,1);
-  if (Wire.available()) { rdata = Wire.read(); }
-  return rdata;
+    int deviceaddress = 0x50;
+    byte rdata = 0xFF;
+    Wire.beginTransmission(deviceaddress);
+    Wire.write((int)(eeaddress >> 8));   // MSB
+    Wire.write((int)(eeaddress & 0xFF)); // LSB
+    Wire.endTransmission();
+    Wire.requestFrom(deviceaddress,1);
+    if (Wire.available()) { rdata = Wire.read(); }
+    return rdata;
 };
 
 void LoRaKeys::loadLoRaKeys(void) {
-  if ( readEEPROM(0) == 0x01 ) {
-    Serial.println("ABP:");
-    byte x = 1;
-    for (byte i = 0; i < 4; ++i) {
-      _DEVADD[i] = readEEPROM(x);
-      ++x;
-    }
+    if ( readEEPROM(0) == 0x01 ) {
+        Serial.println("ABP:");
+        byte x = 1;
+        for (byte i = 0; i < 4; ++i) {
+        _DEVADD[i] = readEEPROM(x);
+        ++x;
+        }
 
-    x = 5;
-    for (byte i = 0; i < 16; ++i) {
-      _NWKKEY[i] = readEEPROM(x);
-      ++x;
-    }
+        x = 5;
+        for (byte i = 0; i < 16; ++i) {
+        _NWKKEY[i] = readEEPROM(x);
+        ++x;
+        }
 
-    x = 21;
-    for (byte i = 0; i < 16; ++i) {
-      _APPKEY[i] = readEEPROM(x);
-      ++x;
-    }
-    buildLoRaKeysABP();  
-  } else if ( readEEPROM(0) == 0x02 ) {
-    Serial.println("OTAA:");
-    byte x = 1;
-    for (byte i = 0; i < 8; ++i) {
-      _APPEUI[i] = readEEPROM(x);
-      ++x;
-    }
+        x = 21;
+        for (byte i = 0; i < 16; ++i) {
+        _APPKEY[i] = readEEPROM(x);
+        ++x;
+        }
+        buildLoRaKeysABP();  
+    } else if ( readEEPROM(0) == 0x02 ) {
+        Serial.println("OTAA:");
+        byte x = 1;
+        for (byte i = 0; i < 8; ++i) {
+        _APPEUI[i] = readEEPROM(x);
+        ++x;
+        }
 
-    x = 9;
-    for (byte i = 0; i < 8; ++i) {
-      _DEVEUI[i] = readEEPROM(x);
-      ++x;
-    }
+        x = 9;
+        for (byte i = 0; i < 8; ++i) {
+        _DEVEUI[i] = readEEPROM(x);
+        ++x;
+        }
 
-    x = 17;
-    for (byte i = 0; i < 16; ++i) {
-      _APPKEY[i] = readEEPROM(x);
-      ++x;
+        x = 17;
+        for (byte i = 0; i < 16; ++i) {
+        _APPKEY[i] = readEEPROM(x);
+        ++x;
+        }
+        buildLoRaKeysOTTA();
+    } else {
+        Serial.println("Unknown");
     }
-    buildLoRaKeysOTTA();
-  } else {
-    Serial.println("Unknown");
-  }
 }
 
 int LoRaKeys::buildLoRaKeysOTTA(void) {
-  static const u1_t PROGMEM APPEUI[8]  = { _APPEUI[7], _APPEUI[6], _APPEUI[5], _APPEUI[4],
-                                           _APPEUI[3], _APPEUI[2], _APPEUI[1], _APPEUI[0] };
-  static const u1_t PROGMEM DEVEUI[8]  = { _DEVEUI[7], _DEVEUI[6], _DEVEUI[5], _DEVEUI[4],
-                                           _DEVEUI[3], _DEVEUI[2], _DEVEUI[1], _DEVEUI[0] };
-  static const u1_t PROGMEM APPKEY[16] = { _APPKEY[0], _APPKEY[1], _APPKEY[2], _APPKEY[3],
-                                           _APPKEY[4], _APPKEY[5], _APPKEY[6], _APPKEY[7],
-                                           _APPKEY[8], _APPKEY[9], _APPKEY[10], _APPKEY[11],
-                                           _APPKEY[12], _APPKEY[13], _APPKEY[14], _APPKEY[15] };
+    static const u1_t PROGMEM APPEUI[8]  = { _APPEUI[7], _APPEUI[6], _APPEUI[5], _APPEUI[4],
+                                             _APPEUI[3], _APPEUI[2], _APPEUI[1], _APPEUI[0] };
+    static const u1_t PROGMEM DEVEUI[8]  = { _DEVEUI[7], _DEVEUI[6], _DEVEUI[5], _DEVEUI[4],
+                                             _DEVEUI[3], _DEVEUI[2], _DEVEUI[1], _DEVEUI[0] };
+    static const u1_t PROGMEM APPKEY[16] = { _APPKEY[0], _APPKEY[1], _APPKEY[2], _APPKEY[3],
+                                             _APPKEY[4], _APPKEY[5], _APPKEY[6], _APPKEY[7],
+                                             _APPKEY[8], _APPKEY[9], _APPKEY[10], _APPKEY[11],
+                                             _APPKEY[12], _APPKEY[13], _APPKEY[14], _APPKEY[15] };
 }
 
 int LoRaKeys::buildLoRaKeysABP(void) {
-  static const u1_t PROGMEM DEVADD[4]  = { _DEVADD[3], _DEVADD[2], _DEVADD[1], _DEVADD[0] };
-  static const u1_t PROGMEM NWKKEY[16] = { _NWKKEY[0], _NWKKEY[1], _NWKKEY[2], _NWKKEY[3],
-                                           _NWKKEY[4], _NWKKEY[5], _NWKKEY[6], _NWKKEY[7],
-                                           _NWKKEY[8], _NWKKEY[9], _NWKKEY[10], _NWKKEY[11],
-                                           _NWKKEY[12], _NWKKEY[13], _NWKKEY[14], _NWKKEY[15] };
-  static const u1_t PROGMEM APPKEY[16] = { _APPKEY[0], _APPKEY[1], _APPKEY[2], _APPKEY[3],
-                                           _APPKEY[4], _APPKEY[5], _APPKEY[6], _APPKEY[7],
-                                           _APPKEY[8], _APPKEY[9], _APPKEY[10], _APPKEY[11],
-                                           _APPKEY[12], _APPKEY[13], _APPKEY[14], _APPKEY[15] };
+    static const u1_t PROGMEM DEVADD[4]  = { _DEVADD[3], _DEVADD[2], _DEVADD[1], _DEVADD[0] };
+    static const u1_t PROGMEM NWKKEY[16] = { _NWKKEY[0], _NWKKEY[1], _NWKKEY[2], _NWKKEY[3],
+                                             _NWKKEY[4], _NWKKEY[5], _NWKKEY[6], _NWKKEY[7],
+                                             _NWKKEY[8], _NWKKEY[9], _NWKKEY[10], _NWKKEY[11],
+                                             _NWKKEY[12], _NWKKEY[13], _NWKKEY[14], _NWKKEY[15] };
+    static const u1_t PROGMEM APPKEY[16] = { _APPKEY[0], _APPKEY[1], _APPKEY[2], _APPKEY[3],
+                                             _APPKEY[4], _APPKEY[5], _APPKEY[6], _APPKEY[7],
+                                             _APPKEY[8], _APPKEY[9], _APPKEY[10], _APPKEY[11],
+                                             _APPKEY[12], _APPKEY[13], _APPKEY[14], _APPKEY[15] };
 }
