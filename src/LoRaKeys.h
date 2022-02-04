@@ -6,15 +6,20 @@
 
 class LoRaKeys {
   private:
-    byte eepDEVADD[4];
-    byte eepAPPEUI[8];
-    byte eepDEVEUI[8];
-    byte eepAPPKEY[16];
-    byte eepNWKKEY[16];
+    byte _DEVADD[4];
+    byte _APPEUI[8];
+    byte _DEVEUI[8];
+    byte _APPKEY[16];
+    byte _NWKKEY[16];
     int buildLoRaKeysABP(void);
     int buildLoRaKeysOTTA(void);
     int readEEPROM(unsigned int eeaddress );
   public:
+    byte DEVADD[4];
+    byte APPEUI[8];
+    byte DEVEUI[8];
+    byte APPKEY[16];
+    byte NWKKEY[16];
     LoRaKeys(void);
     void loadLoRaKeys(void);
 };
