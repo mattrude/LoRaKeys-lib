@@ -2,7 +2,11 @@
 #include <Wire.h>
 #include "LoRaKeys.h"
 
-LoRaKeys::readEEPROM(unsigned int eeaddress ){
+LoRaKeys::LoRaKeys(uint8_t clk_pin, uint8_t data_pin) {
+
+}
+
+void LoRaKeys::readEEPROM(unsigned int eeaddress ){
   int deviceaddress = 0x50;
   byte rdata = 0xFF;
   Wire.beginTransmission(deviceaddress);
@@ -12,9 +16,9 @@ LoRaKeys::readEEPROM(unsigned int eeaddress ){
   Wire.requestFrom(deviceaddress,1);
   if (Wire.available()) { rdata = Wire.read(); }
   return rdata;
-}
+};
 
-LoRaKeys::loadLoRaKeys(void) {
+void LoRaKeys::loadLoRaKeys(void) {
   if ( readEEPROM(0) == 0x01 ) {
     Serial.println("ABP:");
     byte x = 1;
